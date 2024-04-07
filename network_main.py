@@ -223,7 +223,7 @@ def interpret_command(instruction, curr_run_name, curr_run_ids, G):
                 if len(body) <= 0:
                     print('Specify statement/run to delete!')
                     raise CmdInterrupt
-                target = get_id(body[0])
+                target = get_id(body[0], curr_run_ids, G)
                 if input('Node found: delete node? y/n').lower() == 'y':
                     G.remove_node(target)
             elif cmd == '/quit' or cmd == '/q':
@@ -256,6 +256,23 @@ def interpret_command(instruction, curr_run_name, curr_run_ids, G):
                 rewrite_target_id = get_id(body[0], curr_run_ids, G)
                 rewrite_content = ' '.join(body[1:])
                 G.nodes[rewrite_target_id]['label'] = rewrite_content
+            elif cmd == '/help':
+                print('==HELP==')
+                print('When IDs are required, use "print *" to view current IDs and then $N where N is the number displayed during "print *" to target that statement. (I leave using the alternate ID schemas implemented as an exercise for the reader)')
+                print('/s STM - New statement with text "STM".')
+                print('/t STM - New statement "STM", which follows from the last statement.')
+                print('/o ID1 ID2 - Creates a link from statement with ID "ID1" to "ID2".')
+                print('/d ID - Deletes statement with ID "ID".')
+                print('/r RUN_ID - New run [list] of statements with ID "RUN_ID".')
+                print('/p * || ID - Prints all statements [if you put in *], otherwise prints the statement with ID "ID".')
+                print('/x ID - Generates dependencies of statement with ID "ID" and explains it with Autoratiocinator.')
+                print('/l FL.GEXF - Loads rhizome from file with name "FL.GEXF".')
+                print('/lmc FL.GEXF - Loads rhizome from file with name "FL.GEXF", merges it with current knowledge graph, and saves result to output [default "current_graph.gexf"].')
+                print('/c FL.GEXF - Commits current knowledge graph to file with name "FL.GEXF".')
+                print('/q - Quit and save.')
+                print('/fq - Force quit and do not save.')
+                print('/v - Generate graph visualisation.')
+
             else:
                 print('Command not recognised. Please try again?')
             return curr_run_name, curr_run_ids, G
@@ -297,6 +314,7 @@ def mainloop():
         
 
 if __name__ == '__main__':
+    print('Welcome to THEOREM.DS. Type "/help" for help.')
     while True:
         mainloop()
 
