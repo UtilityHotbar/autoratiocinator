@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2024-04-08">
+    <creator>NetworkX 3.1</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="2" title="title" type="string" />
+      <attribute id="3" title="width" type="long" />
+      <attribute id="4" title="networkx_key" type="long" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="tag" type="string" />
+      <attribute id="1" title="size" type="long" />
+    </attributes>
+    <nodes>
+      <node id="895f2a86-91ed-4262-af54-108a48c0d08f" label="Socrates is a man.">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+      <node id="046a1768-66e1-4485-a4ec-82c4725804ce" label="All men are mortal">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+      <node id="54c6f48d-19ca-4566-b6ad-41e96a7cadc0" label="Socrates is mortal.">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+      <node id="281e40a6-a0d4-4a3c-b057-12d10bcd9b1e" label="socrates was a greek citizen">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+      <node id="f2316a64-9b63-40c3-9473-1f211dcc7679" label="all greek citizens were men">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+      <node id="7c293932-58e9-4c51-aa74-17db314e20ac" label="socrates will die.">
+        <attvalues>
+          <attvalue for="0" value="" />
+          <attvalue for="1" value="10" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="895f2a86-91ed-4262-af54-108a48c0d08f" target="281e40a6-a0d4-4a3c-b057-12d10bcd9b1e" id="2">
+        <attvalues>
+          <attvalue for="2" value="SOURCE" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="895f2a86-91ed-4262-af54-108a48c0d08f" target="f2316a64-9b63-40c3-9473-1f211dcc7679" id="3">
+        <attvalues>
+          <attvalue for="2" value="SOURCE" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="54c6f48d-19ca-4566-b6ad-41e96a7cadc0" target="046a1768-66e1-4485-a4ec-82c4725804ce" id="0">
+        <attvalues>
+          <attvalue for="2" value="SOURCE" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="54c6f48d-19ca-4566-b6ad-41e96a7cadc0" target="895f2a86-91ed-4262-af54-108a48c0d08f" id="1">
+        <attvalues>
+          <attvalue for="2" value="SOURCE" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="7c293932-58e9-4c51-aa74-17db314e20ac" target="54c6f48d-19ca-4566-b6ad-41e96a7cadc0" id="4">
+        <attvalues>
+          <attvalue for="2" value="SOURCE" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>
