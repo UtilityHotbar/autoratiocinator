@@ -8,6 +8,10 @@ Trying to create a reasoning engine based on a knowledge graph. To try a toy exa
 /explain $5
 ```
 
+## Quick Overview
+
+Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. The project is **in progress**.
+
 ## Explanation
 `network_main.py` contains a CLI based interface for constructing knowledge graphs (MultiDiGraphs in `networkx` where nodes are statements and directed edges infer a dependency relationship between statements. E.g. "Socrates is mortal" depends on "Socrates is a man" and "All men are mortal"). Use `/help` to list all available commands. You can create nodes, delete nodes, create and delete dependencies, visualise graphs, and list dependencies for any given node.
 
