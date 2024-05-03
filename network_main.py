@@ -2,8 +2,13 @@
 import networkx as nx
 import uuid
 import pyvis.network
-from ratiocinator import tree_convince_loop, dumb_convince_loop
-from constants import *
+from topdown_ratiocinator import tree_convince_loop
+from ratiocinatorutils import *
+
+# TODO: Use a simulated conversation to add detail to model answers
+# TODO: Query produces highlighted sentences from original source
+# TODO: Move to Microsoft AICI rLLM as backend rather than OpenAI API
+# TODO: Use verifier prompt to control for hallucinations (are hallucinations an NP class of problem, easy to verify but hard to solve?)
 
 class IdError(Exception):
     pass
@@ -11,12 +16,27 @@ class IdError(Exception):
 class CmdInterrupt(Exception):
     pass
 
-def list_dependencies(graph, node):
+def list_dependencies(graph, node, l=0, head=True):
+    l += 1
     deps = []
     for source in graph.successors(node):
-        if graph.has_edge(node, source, key=SOURCE) and source != node:  # Be careful to avoid circular dependencies!
-            deps.append(source)
-            deps += list_dependencies(graph, source)
+        l += 1
+        if graph.has_edge(node, source, key=SOURCE) and (source != node):  # Be careful to avoid circular dependencies!
+            # Filtering out connection edges
+            if not graph.get_edge_data(node, source, key=SOURCE)['title'] == SOURCE_LABEL:
+                continue
+            # This is to break up endless reference loops
+            if l < DEPENDENCY_SEARCH_RECURSION_LIMIT:
+                deps.append(source)
+                results = list_dependencies(graph, source, l, head=False)
+                deps += results[0]
+                deps = list(set(deps))
+                l = results[1]
+            else:
+                print('[!] Max recursion limit reached during dependency search.')
+
+    if not head:
+        return deps, l
     return deps
 
 
@@ -289,17 +309,17 @@ def mainloop():
     done = False
     while not done:
         try:
-            instruction = input('THM.DS> ')
+            instruction = input('SOCRATIDES> ')
             curr_run_name, curr_run_ids, G = interpret_command(instruction, curr_run_name, curr_run_ids, G)
         except IdError as anticipated:
             # ID resolution errors usually don't entail data corruption etc.
-            print('ID error thrown with the message:', anticipated)
+            print('[!] ID error thrown with the message:', anticipated)
         except CmdInterrupt as interrupt:
             # We assume that the interpretation function has already thrown an error message so we just smoothly pick up the REPL
             print('Returning to REPL flow.')
         except Exception as unanticipated:
             # For everything else we save an error dump before trying to move on.
-            print('Unanticipated system error thrown with the message:', repr(unanticipated))
+            print('[!] Unanticipated system error thrown with the message:', repr(unanticipated))
             print('Dumping rhizome to "recovery.gexf" just in case.')
             nx.write_gexf(G, 'recovery.gexf')
             if input('Raise the full error? This will end the REPL. [y/n] ').lower() == 'y':
@@ -307,14 +327,14 @@ def mainloop():
             else:
                 print('We now return you to your regularly scheduled REPL.')
         except KeyboardInterrupt:
-            print('Saving and exiting (/fq for force quit without saving).')
-            nx.write_gexf(G, CURRENT)
-            print('Bye!')
+            print('Brute force exiting (/q for quit with saving).')
+            # nx.write_gexf(G, CURRENT)
+            # print('Bye!')
             exit()
         
 
 if __name__ == '__main__':
-    print('Welcome to THEOREM.DS. Type "/help" for help.')
+    print('Welcome to SOCRATIDES. Type "/help" for help.')
     while True:
         mainloop()
 

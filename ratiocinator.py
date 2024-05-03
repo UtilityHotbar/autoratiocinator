@@ -1,26 +1,33 @@
-from openai import OpenAI
 import os
 import networkx as nx
-from constants import *
+from ratiocinatorutils import *
 import time
 
-MODEL_NAME = 'gpt-4'
 STM_HISTORY = []
+SKIP_VAL = 0.75
+DEPTH_LIMIT = 10
+DEPENDENCY_SEARCH_RECURSION_LIMIT = 1000
 
-client = OpenAI(api_key=(os.getenv('OPENAI_API_KEY')))
 
-CONVINCER_PROMPT = 'You are a clever, dedicated, and confident philosopher designed to convince an end user of a hypothesis for the purposes of education. The hypothesis is this statement %STM%. Make your answer concise.\n'
+CONVINCER_PROMPT = 'You want to convince an end user of a hypothesis for the purposes of education. The hypothesis is this statement %STM%. Make your answer concise.\n'
 SCRUTINISER_PROMPT = 'You are an attentive, clever, and careful assistant. Your job is to see if the message below is off topic from a discussion about the statement "%STM%". This is the statement to analyse: "%CAND%". We need to tell if the statement is part of a discussion about "%STM%". Output your answer in one word: YES or NO, in all caps.'
 
-INIT_PROMPT = 'You are a clever teacher teaching a clever student. You want to introduce the topic "%STM%". In a sentence or two say what you would say to introduce the topic. In your response, only include the dialogue surrounded by speech marks.'
-BRIDGE_PROMPT = 'You are a clever teacher teaching a student about the statement "%PREV_PROMPT%". You want to switch the topic to something not really related and talk about "%STM%" instead. In a sentence or two say what you would say to change the topic. In your response, only include the dialogue surrounded by speech marks.'
-RAISE_LEVEL_PROMPT = 'You are a clever teacher teaching a student about the statement "%PREV_PROMPT%". You want to build on this and talk about the statement "%STM%". In a sentence or two say what you would say to change the topic. In your response, only include the dialogue surrounded by speech marks.'
+BASIC_TEACHER_PROMPT_HEADER = 'You are a clever teacher teaching a clever student. All your dialogue is part of this conversation.'
+
+TEACHER_PROMPT_HEADER = 'You are a clever teacher teaching a clever student. All your dialogue is part of this conversation.'
+
+INIT_PROMPT = 'You want to introduce the topic "%STM%". In a sentence or two say what you would say to introduce the topic. In your response, only include the dialogue surrounded by speech marks.'
+BRIDGE_PROMPT = 'You are talking about the statement "%PREV_PROMPT%". You want to switch the topic to something not really related and talk about "%STM%" instead. In a sentence or two say what you would say to change the topic. In your response, only include the dialogue surrounded by speech marks.'
+RAISE_LEVEL_PROMPT = 'You are talking about the statement "%PREV_PROMPT%". You want to build on this and talk about the statement "%STM%". In a sentence or two say what you would say to change the topic. In your response, only include the dialogue surrounded by speech marks.'
 PROMPT_CONNECT_PROMPT = 'You are a clever teacher with two statements in front of you. Statement one is "%STM1%". Statement two is "%STM2%". Are they related? Answer in one word, yes or no.'
 
 EVALUATOR_PROMPT = 'You are a clever teacher teaching a bright student about the topic "%STM%". They have just given you this response: %RESPONSE%. Is the student confident in their knowledge, resolved about this topic, ready to move on to the next topic? Respond in one word, yes or no.'
 
-def stm_convince_loop(stm, additional_info='', last_prompt=''):
-    chosen_start_prompt = INIT_PROMPT
+def stm_convince_loop(stm, additional_info='', last_prompt='', goal=''):
+    header = BASIC_TEACHER_PROMPT_HEADER
+    if goal:
+        header = TEACHER_PROMPT_HEADER.replace('%TARGET%', goal)
+    chosen_start_prompt = header+INIT_PROMPT
 
     if not last_prompt:
         last_prompt = 'a topic'
@@ -32,9 +39,9 @@ def stm_convince_loop(stm, additional_info='', last_prompt=''):
             temperature=0.5,
             max_tokens=300)
         if connection_verification.choices[0].message.content.lower().strip('.') == 'yes':
-            chosen_start_prompt = RAISE_LEVEL_PROMPT
+            chosen_start_prompt = header+RAISE_LEVEL_PROMPT
         else:
-            chosen_start_prompt = BRIDGE_PROMPT
+            chosen_start_prompt = header+BRIDGE_PROMPT
     history = []
     # if not stm:
     #     stm = 'Unicorns are real.'
@@ -57,7 +64,7 @@ def stm_convince_loop(stm, additional_info='', last_prompt=''):
         while not model_answer_acceptable:
             completion= client.chat.completions.create(model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": CONVINCER_PROMPT.replace('%STM%', stm)+additional_info},
+                {"role": "system", "content": header+CONVINCER_PROMPT.replace('%STM%', stm)+additional_info},
                 {"role": "user", "content": "I don't believe you. Why is this statement true?"}
                 ]+history,
             temperature=0.75,
@@ -74,7 +81,7 @@ def stm_convince_loop(stm, additional_info='', last_prompt=''):
                 model_answer_acceptable = True
                 continue
             else:
-                print(result)
+                print('[!] Invalid model output. Regenerating...')
                 tries += 1
             if tries == 5:
                 print('[!] I couldn\'t find an answer that makes sense given your last statement. I\'ll forget the last thing you said.')
@@ -98,6 +105,7 @@ def stm_convince_loop(stm, additional_info='', last_prompt=''):
             temperature=0.75,
             max_tokens=300)
             if (evaluation.choices[0].message.content.lower()=='yes'):
+                print('[!] Statement Completed.')
                 return True
             else:
                 history.append({"role": "user", "content": user_input})
@@ -113,23 +121,35 @@ def stm_convince_loop(stm, additional_info='', last_prompt=''):
 #             statements_tree = nx.compose(statements_tree, get_statements_graph(graph, source, statements_tree))
 #     return statements_tree
 
-def get_arg_stack(graph, node, dist=0):
-    steps = {NODE: node, CHILDREN: {}, DIST: dist}
+def get_arg_stack(graph, node, dist=0, all_exp=None, head=True):
+    if not all_exp:
+        all_exp = []
+    steps = {NODE: node, CHILDREN: {}, DIST: dist, LABEL: graph.nodes[node]['label']}
     for succ in graph.successors(node):
-        if succ != node:
+        if graph.has_edge(node, succ, key=SOURCE) and succ != node and not succ in all_exp:
+            # Filtering out connection edges
+            if not graph.get_edge_data(node, succ, key=SOURCE)['title'] == SOURCE_LABEL:
+                continue
+            all_exp.append(succ)
             desc = list(graph.successors(succ))
             if len(desc) > 0 and dist < DEPTH_LIMIT:
-                steps[CHILDREN][succ] = get_arg_stack(graph, succ, dist+1)
+                results = get_arg_stack(graph, succ, dist+1, all_exp, head=False)
+                all_exp = results[0]
+                steps[CHILDREN][succ] = results[1]
             else:
-                steps[CHILDREN][succ] = {NODE: succ, CHILDREN: AXIOM, DIST: dist}
-    return steps
+                steps[CHILDREN][succ] = {NODE: succ, CHILDREN: AXIOM, DIST: dist, LABEL: graph.nodes[succ]['label']}
+    if head:
+        return steps
+    else:
+        return [all_exp, steps]
 
 def tree_convince_loop(graph, node):
     # statements_graph = get_statements_graph(graph, node)
     # print(statements_graph)
     arg_stack = get_arg_stack(graph, node)
+    print(arg_stack)
     ## Now we do depth first search
-    if dfs_convincer(arg_stack, graph):
+    if dfs_convincer(arg_stack, graph, graph.nodes[arg_stack[NODE]]['label']):
         print('[!] Goal complete.')
     else:
         print('[!] Goal rejected.')
@@ -143,7 +163,9 @@ def convert_prior_results(yes_nos, graph):
             summary += f'The user does not believe that {graph.nodes[item]["label"]}.\n'
     return summary
 
-def dfs_convincer(arg_stack, graph):
+def dfs_convincer(arg_stack, graph, goal=''):
+    if not goal:
+        goal = graph.nodes[arg_stack['NODE']]['label']
     if arg_stack[CHILDREN] != AXIOM:
         # print('going deeper')
         yes_nos = {}
@@ -152,7 +174,7 @@ def dfs_convincer(arg_stack, graph):
         tried_skip = False
         for sub_argument in arg_stack[CHILDREN]:
             sub_argument_content = arg_stack[CHILDREN][sub_argument]
-            if dfs_convincer(sub_argument_content, graph):
+            if dfs_convincer(sub_argument_content, graph, goal):
                 yes_nos[sub_argument] = True
                 conviction_count += 1
                 if conviction_count >= round(totals*SKIP_VAL):
@@ -162,7 +184,7 @@ def dfs_convincer(arg_stack, graph):
                         s_hist = STM_HISTORY[-2]
                     else:
                         s_hist = None
-                    if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'], additional_info=convert_prior_results(yes_nos, graph), last_prompt=s_hist):
+                    if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'], additional_info=convert_prior_results(yes_nos, graph), last_prompt=s_hist, goal=goal):
                         return True
             else:
                 yes_nos[sub_argument] = False
@@ -172,7 +194,7 @@ def dfs_convincer(arg_stack, graph):
                 s_hist = STM_HISTORY[-2]
             else:
                 s_hist = None
-            if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'], additional_info=convert_prior_results(yes_nos, graph), last_prompt=s_hist):
+            if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'], additional_info=convert_prior_results(yes_nos, graph), last_prompt=s_hist, goal=goal):
                 return True
             else:
                 return False
@@ -184,7 +206,7 @@ def dfs_convincer(arg_stack, graph):
             s_hist = STM_HISTORY[-2]
         else:
             s_hist = None
-        if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'],last_prompt=s_hist):
+        if stm_convince_loop(graph.nodes[arg_stack[NODE]]['label'],last_prompt=s_hist, goal=goal):
             return True
         else:
             return False
