@@ -1,5 +1,5 @@
 # autoratiocinator
-Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations.
+Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations. Also uses `tiktoken` for token calculations specific to the OpenAI API, `nltk` for basic NLP procedures, and `numpy` for comparing embeddings.
 
 ## Quickstart
 Trying to create a reasoning engine based on a knowledge graph. To try a toy example save the openai API key as an environmental variable in shell and run the following commands:
