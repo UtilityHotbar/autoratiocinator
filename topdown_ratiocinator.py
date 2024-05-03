@@ -8,7 +8,7 @@ import random
 
 DEPTH_LIMIT = 10
 
-AUTHOR_EXPLAIN_PROMPT = 'You are a clever teacher trying to explain to a student why an author made a particular statement. The statement is "%STM%". The paragraph in which the statement appears is:\n "%PARAGRAPH%."\n%STUDENT% \nIn your response give a succinct explanation of why the author made this point. Stick strictly to the author\'s original words when saying your answer.'
+AUTHOR_EXPLAIN_PROMPT = 'You are a clever teacher trying to explain to a student why an author made a particular statement. The statement is "%STM%". The author has also made these supporting statements:\n "%SUPPORT%."\n%STUDENT% \nIn your response give a succinct explanation of why the author made this point. Stick strictly to the author\'s original words when saying your answer.'
 SCRUTINISER_PROMPT = 'You are an attentive, clever, and careful assistant. Your job is to see if the message below is off topic from a discussion about the statement "%STM%". This is the statement to analyse: "%CAND%". We need to tell if the statement is part of a discussion about "%STM%".'
 
 RELEVANCY_PROMPT = 'Here are two phrases. Is phrase 1 a search query for phrase 2? \nPhrase 1: "%STM1%". \nPhrase 2: "%STM2%".'
@@ -78,8 +78,8 @@ def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_hist
     starting_msg = get_completion(messages=[
         {"role": "system", "content": starting_prompt},
     ])
-    print('refining')
-    starting_msg = get_refined_answer(starting_msg, supports)
+    # print('refining')
+    # starting_msg = get_refined_answer(starting_msg, supports)
     stm_history.append({'role': 'system', 'content': starting_msg})
     print('\nDEBUG -- GOAL:', goal, '\nPROMPT:', starting_prompt, '\nDICT:', dict_of_stms, '\n\nSUPPORT:', supports, '\nPRIOR USER DATA:', prior_user_data,'\n')
     print('\n===\n')
