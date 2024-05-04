@@ -111,8 +111,8 @@ def get_completion(messages, temperature=0.75, max_tokens=3000, model=MODEL_NAME
     answer = client.chat.completions.create(model=model, messages=messages, temperature=temperature, max_tokens=max_tokens)
     return answer.choices[0].message.content
 
-def get_refined_answer(init_prompt: str, additional_details: list, max_tokens=3000):
-    CHANGE_PROMPT = 'How would you change your answer if you had this additional information: %ADD%. Return your new answer as if you were answering my original question. Keep it short and succint.'
+def get_refined_answer(init_prompt: str, additional_details: list, max_tokens=3000, ):
+    CHANGE_PROMPT = 'How would you change your answer if you had this additional information: %ADD%. Return your new answer as if you were answering my original question.'
     history = [{'role':'system', 'content': 'You are a clever and attentive assistant that listens to user directions.'},{'role': 'user', 'content': init_prompt}]
     init_answer = get_completion(messages=history)
     history.append({'role': 'assistant', 'content': init_answer})

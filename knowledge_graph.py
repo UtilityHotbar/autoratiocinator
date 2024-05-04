@@ -17,12 +17,6 @@ CONTEXT_WINDOW_SIZE = 3
 
 BLANKS = ['', ' ', '\n']
 
-OLD_TEXT = '''
- Cult members are often depicted in the media as weak-willed and foolish. But the Church of Scientology — long accused of being a cult, an allegation they have endlessly denied — recruits heavily among the rich and powerful. The Finders, a D.C.-area cult that started in the 1970s, included a wealthy oil-company owner and multiple members with Ivy League degrees. All of them agreed to pool their money and hand over control of where they worked and how they raised their children to their cult leader. Haruki Murakami wrote that Aum Shinrikyo members, many of whom were doctors or engineers, “actively sought to be controlled.” 
-'''
-
-TEXT = open('test_passage.txt').read()
-
 SIMILARITY_THRESHOLD = 0.9
 
 REWRITER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to rewrite passages into clearer, more intelligible sentences that are easier to read and understand. Where possible, use simple language and clear vocabulary. If the sentence is a simple sentence, keep it the same. If the sentence is too long or complex, split it into multiple shorter sentences. Do not say "the passage said...", rewrite it as if you were the writer. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
@@ -152,11 +146,11 @@ def associator(text):
                 sub = substitutions[sentence]
                 if not (sub in uuid_reference):
                     uuid_reference[sub] = str(uuid.uuid4())
-                    G.add_node(uuid_reference[sub], label=sub, comments=[] ,tag='')
+                    G.add_node(uuid_reference[sub], label=sub ,tag='')
                 uuid_reference[sentence] = uuid_reference[sub]
             else:
                 uuid_reference[sentence] = str(uuid.uuid4())
-            G.add_node(uuid_reference[sentence], label=sentence, comments=[] ,tag='')
+            G.add_node(uuid_reference[sentence], label=sentence,tag='')
             print(G, uuid_reference)
         compare_candidates = []
         compare_candidates += text[max(0, i-CONTEXT_WINDOW_SIZE):min(len(text)-1, i+CONTEXT_WINDOW_SIZE)]  # nab immediate context
@@ -172,12 +166,12 @@ def associator(text):
                     sub = substitutions[candidate]
                     if not (sub in uuid_reference):
                         uuid_reference[sub] = str(uuid.uuid4())
-                        G.add_node(uuid_reference[sub], label=sub, comments=[] ,tag='')
+                        G.add_node(uuid_reference[sub], label=sub,tag='')
                     uuid_reference[candidate] = uuid_reference[sub]
                     candidate = sub
                 else:
                     uuid_reference[candidate] = str(uuid.uuid4())
-                G.add_node(uuid_reference[candidate], label=candidate, comments=[] ,tag='')
+                G.add_node(uuid_reference[candidate], label=candidate,tag='')
                 print(G, uuid_reference)
             make_pair = list(sorted([sentence, candidate]))
             if make_pair in pairs or sentence == candidate:
@@ -234,15 +228,18 @@ def save(G):
     print('Saved to "generated.gexf".')
 
 if __name__ == '__main__':
-    # print('Rewriting text')
-    # cleaned_text = rewriter(TEXT)
-    # with open('cleaned_text_in_progress.txt', 'w') as g:
-    #     g.write('\n'.join(cleaned_text))
-    with open('cleaned_text_in_progress.txt') as f:
-        cleaned_text_from_file = f.readlines()
-    print('Associating text')
-    G = associator(cleaned_text_from_file)
-    print('Visualising Rhizome')
-    visualise(G)
-    print('Saving Rhizome')
-    save(G)
+    choice = input('Choose: [r]ewrite or [g]enerate graph? ').lower()
+    if choice == 'r':
+        print('Rewriting text')
+        cleaned_text = rewriter(input('File path: '))
+        with open('cleaned_text_in_progress.txt', 'w') as g:
+            g.write('\n'.join(cleaned_text))
+    elif choice == 'g':
+        with open('cleaned_text_in_progress.txt') as f:
+            cleaned_text_from_file = f.readlines()
+        print('Associating text')
+        G = associator(cleaned_text_from_file)
+        print('Visualising Rhizome')
+        visualise(G)
+        print('Saving Rhizome')
+        save(G)

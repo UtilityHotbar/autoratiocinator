@@ -4,11 +4,12 @@ from ratiocinatorutils import *
 import time
 import random
 
-# TODO: add paragraph context!!
+REFERENCE_ORIG_TEXT = True
+REFERENCE_PATH = 'cleaned_text_in_progress.txt'
 
 DEPTH_LIMIT = 10
 
-AUTHOR_EXPLAIN_PROMPT = 'You are a clever teacher trying to explain to a student why an author made a particular statement. The statement is "%STM%". The author has also made these supporting statements:\n "%SUPPORT%."\n%STUDENT% \nIn your response give a succinct explanation of why the author made this point. Stick strictly to the author\'s original words when saying your answer.'
+AUTHOR_EXPLAIN_PROMPT = 'You are a clever teacher trying to explain to a student why an author made a particular statement. The statement is "%STM%".\n%PARAGRAPH%\n%STUDENT% \nIn your response give a succinct explanation of why the author made this point. Stick strictly to the author\'s original words when saying your answer.'
 SCRUTINISER_PROMPT = 'You are an attentive, clever, and careful assistant. Your job is to see if the message below is off topic from a discussion about the statement "%STM%". This is the statement to analyse: "%CAND%". We need to tell if the statement is part of a discussion about "%STM%".'
 
 RELEVANCY_PROMPT = 'Here are two phrases. Is phrase 1 a search query for phrase 2? \nPhrase 1: "%STM1%". \nPhrase 2: "%STM2%".'
@@ -43,8 +44,12 @@ def tree_convince_loop(graph, node):
     # print(statements_graph)
     arg_stack = get_arg_stack(graph, node)
     print(arg_stack)
+    if REFERENCE_ORIG_TEXT:
+        reference_text = open(REFERENCE_PATH).readlines()
+    else:
+        reference_text = None
     ## Now we do depth first search
-    if topdown_dfs_convincer(arg_stack, graph):
+    if topdown_dfs_convincer(arg_stack, graph, reference_text=reference_text):
         print('[!] Goal complete.')
     else:
         print('[!] Goal rejected.')
@@ -57,29 +62,31 @@ def get_all_stms(arg_stack, graph):
             all_stms = all_stms | get_all_stms(arg_stack[CHILDREN][sub_arg], graph)
     return all_stms
 
-def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_history=None, prior_user_data=None):
+def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_history=None, prior_user_data=None, reference_text=None):
     if not goal:
         goal = graph.nodes[arg_stack[NODE]]['label']
     if not dict_of_stms:
         dict_of_stms = get_all_stms(arg_stack, graph)
     if not stm_history:
         stm_history = []
-    supports = 'Nothing was said by the author about this.'
+    supports = ''
     immediate_support_stms = []
     if arg_stack[CHILDREN]:
         for subarg in arg_stack[CHILDREN]:
-            immediate_support_stms.append(dict_of_stms[subarg])
-    supports = ' '.join(immediate_support_stms)
+            immediate_support_stms.append('The author also said that "'+dict_of_stms[subarg].strip("\n")+'"')
+    if immediate_support_stms:
+        supports = ' '.join(immediate_support_stms).strip('\n')
+
+    paragraph = ''
+    if REFERENCE_ORIG_TEXT and reference_text:
+        si = reference_text.index(goal)
+        paragraph = 'This is the immediate context in which the statement was found: "'+'\n'.join(reference_text[max(si-3,0):si+3]).strip('\n')+'"'
     student_stm = ''
     if prior_user_data:
         for prev_usr_stm in prior_user_data:
-            student_stm += f'The student believes that ${prev_usr_stm} is ${str(prior_user_data[prev_usr_stm])}.'
-    starting_prompt = AUTHOR_EXPLAIN_PROMPT.replace('%STM%', goal).replace('%SUPPORT%', supports).replace('%STUDENT%', student_stm)
-    starting_msg = get_completion(messages=[
-        {"role": "system", "content": starting_prompt},
-    ])
-    # print('refining')
-    # starting_msg = get_refined_answer(starting_msg, supports)
+            student_stm += f'The student believes that "{prev_usr_stm}" is {str(prior_user_data[prev_usr_stm])}.'
+    starting_prompt = AUTHOR_EXPLAIN_PROMPT.replace('%STM%', goal.strip('\n')).replace('%PARAGRAPH%', paragraph).replace('%STUDENT%', student_stm)
+    starting_msg = get_refined_answer(starting_prompt, immediate_support_stms)
     stm_history.append({'role': 'system', 'content': starting_msg})
     print('\nDEBUG -- GOAL:', goal, '\nPROMPT:', starting_prompt, '\nDICT:', dict_of_stms, '\n\nSUPPORT:', supports, '\nPRIOR USER DATA:', prior_user_data,'\n')
     print('\n===\n')
@@ -99,7 +106,7 @@ def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_hist
                 for stm_id in dict_of_stms:
                     if dict_of_stms[stm_id] != goal:
                         if get_mc_answer_simple(RELEVANCY_PROMPT.replace('%STM1%', rest_of_query).replace('%STM2%', dict_of_stms[stm_id]), ['yes', 'no'], iterations=1):
-                            print(f'I think you want to discuss this idea further: "${dict_of_stms[stm_id]}"')
+                            print(f'I think you want to discuss this idea further: "{dict_of_stms[stm_id]}"')
                             if topdown_dfs_convincer(get_arg_stack(graph, stm_id), graph, prior_user_data=prior_user_data):
                                 prior_user_data[dict_of_stms[stm_id]] = True
                             else:
