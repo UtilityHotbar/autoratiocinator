@@ -117,7 +117,8 @@ def get_refined_answer(init_prompt: str, additional_details: list, max_tokens=30
     init_answer = get_completion(messages=history)
     history.append({'role': 'assistant', 'content': init_answer})
     for detail in additional_details:
-        new_answer = get_completion(history+[{'role': 'user', 'content': CHANGE_PROMPT.replace('%ADD%', detail)}], max_tokens=max_tokens)
+        history.append({'role': 'user', 'content': CHANGE_PROMPT.replace('%ADD%', detail)})
+        new_answer = get_completion(history, max_tokens=max_tokens)
         history.append({'role': 'assistant', 'content': new_answer})
     return new_answer
 
