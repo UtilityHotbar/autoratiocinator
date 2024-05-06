@@ -39,7 +39,9 @@ if text_file_to_analyse is not None:
         st.write('## Analysis')
         st.write(f'Sentence to explain: {sentence}')
         node = nodelist[reflist.index(sentence)]
-        with st.expander("Sentence dependencies"):
-            st.write('* '+'\n* '.join(list_dependencies(G, node)))
+        alldeps = list_dependencies(G, node)
+        if alldeps:
+            with st.expander("Sentence dependencies"):
+                st.write('* '+'\n* '.join([G.nodes[_]['label'] for _ in alldeps]))
         arg_stack = get_arg_stack(G, node)
         st.write(topdown_dfs_convincer(arg_stack, G, sentence, reference_text=cleaned_text, repl=False))
