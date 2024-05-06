@@ -12,6 +12,7 @@ from ratiocinatorutils import *
 import pyvis
 import copy
 import numpy as np
+import tempfile
 
 CONTEXT_WINDOW_SIZE = 3
 
@@ -209,7 +210,7 @@ def associator(text):
     return G
 
 
-def visualise(G):
+def visualise(G, path='generated.html'):
     show_net = pyvis.network.Network(height="750px", width="100%", bgcolor="#222222", font_color="white", directed=True)
     show_net.barnes_hut()
     show_net.show_buttons(filter_=['physics'])
@@ -219,8 +220,8 @@ def visualise(G):
             edge['color'] = '#99ffcc'
         elif edge['title'] == CONNECT_LABEL:
             edge['color'] = '#ff9999'
-    show_net.save_graph('generated.html')
-    print('Rhizome saved to "generated.html".')
+    show_net.save_graph(path)
+    print(f'Rhizome saved to "{path}".')
 
 
 def save(G):
