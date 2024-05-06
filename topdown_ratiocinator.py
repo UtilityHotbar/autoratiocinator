@@ -62,7 +62,7 @@ def get_all_stms(arg_stack, graph):
             all_stms = all_stms | get_all_stms(arg_stack[CHILDREN][sub_arg], graph)
     return all_stms
 
-def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_history=None, prior_user_data=None, reference_text=None):
+def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_history=None, prior_user_data=None, reference_text=None, repl=True):
     if not goal:
         goal = graph.nodes[arg_stack[NODE]]['label']
     if not dict_of_stms:
@@ -80,7 +80,7 @@ def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_hist
     paragraph = ''
     if REFERENCE_ORIG_TEXT and reference_text:
         si = reference_text.index(goal)
-        paragraph = 'This is the immediate context in which the statement was found: "'+'\n'.join(reference_text[max(si-3,0):si+3]).strip('\n')+'"'
+        paragraph = 'This is the immediate context in which the statement was found: "'+''.join(reference_text[max(si-3,0):si+3]).strip('\n')+'"'
     student_stm = ''
     if prior_user_data:
         for prev_usr_stm in prior_user_data:
@@ -91,6 +91,8 @@ def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_hist
     print('\nDEBUG -- GOAL:', goal, '\nPROMPT:', starting_prompt, '\nDICT:', dict_of_stms, '\n\nSUPPORT:', supports, '\nPRIOR USER DATA:', prior_user_data,'\n')
     print('\n===\n')
     print(starting_msg)
+    if not repl:
+        return starting_msg
     while True:
         valid_user_answ = False
         while not valid_user_answ:

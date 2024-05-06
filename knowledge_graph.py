@@ -159,7 +159,7 @@ def associator(text):
             compare_candidates += get_top_search_results(sentence, prev_embed)
         compare_candidates = list(set(compare_candidates)) #  No duplicate LLM calls!
         print(compare_candidates)
-        # Do pairwise LLM-powered comparison for each pair
+        # Do pairwise LLM-powered comparison for each pair (we need to add new nodes to the graph if theey haven't been added yet)
         for candidate in compare_candidates:
             if not (candidate in uuid_reference.keys()):
                 if candidate in substitutions:
@@ -222,6 +222,7 @@ def visualise(G):
     show_net.save_graph('generated.html')
     print('Rhizome saved to "generated.html".')
 
+
 def save(G):
     print(G, G.nodes)
     nx.write_gexf(G, 'generated.gexf')
@@ -231,7 +232,7 @@ if __name__ == '__main__':
     choice = input('Choose: [r]ewrite or [g]enerate graph? ').lower()
     if choice == 'r':
         print('Rewriting text')
-        cleaned_text = rewriter(input('File path: '))
+        cleaned_text = rewriter(open(input('File path: ')).read())
         with open('cleaned_text_in_progress.txt', 'w') as g:
             g.write('\n'.join(cleaned_text))
     elif choice == 'g':
