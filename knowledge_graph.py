@@ -23,7 +23,7 @@ SIMILARITY_THRESHOLD = 0.9
 REWRITER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to rewrite passages into clearer, more intelligible sentences that are easier to read and understand. Where possible, use simple language and clear vocabulary. If the sentence is a simple sentence, keep it the same. If the sentence is too long or complex, split it into multiple shorter sentences. Do not say "the passage said...", rewrite it as if you were the writer. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
 NOUN_EXPANDER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to expand pronouns like "they", "them", "it" etc. into the nouns they represent. For example, if you see "John went to the store. He was hungry", return "John went to the store. John was hungry". If people are quoted, add who was quoted. If you are given "The author cites Cicero. He was writing about romans. It is said that the romans are clever." Return "The author cites Cicero. Cicero was writing about romans. Cicero said that the romans are clever." This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
 SUMMARISER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to summarise a passage into one or a few short sentences representing its key arguments. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
-COMPARATOR_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to compare two sentences and see if they are related. These are the sentences you need to compare. \n Sentence 1: "%STM1%" \n Sentence 2: (located %CONTEXT% \sentence 1) "%STM2%". \nIf the two sentences above are related, answer one word "related". If the first sentence depends on the second, answer "first-depend-second". If the second sentence depends on the first, answer "second-depend-first". Otherwise, answer "unrelated".'
+COMPARATOR_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to compare two sentences and see if they are related. These are the sentences you need to compare. \n Sentence 1: "%STM1%" \n Sentence 2: (located %CONTEXT% \sentence 1) "%STM2%". \nIf the two sentences above are related, answer "related". If the first sentence depends on the second, answer "first-depend-second". If the second sentence depends on the first, answer "second-depend-first". Otherwise, answer "unrelated".'
 
 
 def get_key(val, d):
@@ -97,13 +97,14 @@ def associator_dumb(text):
             done = False
             while not done:
                 done = True
-                relate = client.chat.completions.create(model=MODEL_NAME,
-                    messages=[
-                        {"role": "system", "content": COMPARATOR_PROMPT.replace('%STM1%', curr_sentence).replace('%STM2%', next_sentence)},
-                        ],
-                    temperature=0.5,
-                    max_tokens=1000)
-                answer = relate.choices[0].message.content.lower().strip('"')
+                # relate = client.chat.completions.create(model=MODEL_NAME,
+                #     messages=[
+                #         {"role": "system", "content": COMPARATOR_PROMPT.replace('%STM1%', curr_sentence).replace('%STM2%', next_sentence)},
+                #         ],
+                #     temperature=0.5,
+                #     max_tokens=1000)
+                # answer = relate.choices[0].message.content.lower().strip('"')
+                answer = get_mc_answer_simple(COMPARATOR_PROMPT.replace('%STM1%', curr_sentence).replace('%STM2%', next_sentence), ['related', 'first-depend-second', 'second-depend-first'],)
                 if answer == 'related':
                     G.add_edge(cid, nid, key=CONNECT, title=CONNECT_LABEL)
                 elif answer == 'first-depend-second':
