@@ -8,6 +8,14 @@ from network_main import *
 import uuid
 import tempfile
 
+@st.cache_data
+def associator_wrap(cleaned_text):
+    return associator(cleaned_text)
+
+@st.cache_data
+def rewriter_wrap(raw_text):
+    return rewriter(raw_text)
+
 st.write('''
 # Socratides          
 ''')
@@ -15,10 +23,10 @@ st.write('''
 text_file_to_analyse = st.file_uploader("Choose a text file to analyse", type="txt")
 if text_file_to_analyse is not None:
     string_data = text_file_to_analyse.getvalue().decode("utf-8")
-    cleaned_text = rewriter(string_data)
+    cleaned_text = rewriter_wrap(string_data)
     with st.expander("Cleaned text"):
         st.write(cleaned_text)
-    G = associator(cleaned_text)
+    G = associator_wrap(cleaned_text)
     with tempfile.TemporaryDirectory() as temp:
         tmp_path = temp+'/generated.html'
         visualise(G, path=tmp_path)
