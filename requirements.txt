@@ -1,0 +1,7 @@
+streamlit
+numpy
+networkx
+tiktoken
+nltk
+pyvis
+openai
