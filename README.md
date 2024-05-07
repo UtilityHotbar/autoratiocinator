@@ -17,7 +17,7 @@ Trying to create a reasoning engine based on a knowledge graph. To try a toy exa
 
 Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. 
 
-My approach incorporates techniques drawn from theorem provers like [Lean](https://lean-lang.org/), guided conversation engines like [CICERO](https://www.science.org/doi/10.1126/science.ade9097), classical theories of rhetoric and [syllogisms](https://en.wikipedia.org/wiki/Syllogism), and my own experience as a reader. It allows the system to take in a text, clean it to make it less ambiguous, generate a knowledge graph, and then use textual context and the knowledge graph combined to answer questions about why the author wrote certain parts of the text.
+My approach incorporates techniques drawn from theorem provers like [Lean](https://lean-lang.org/), guided conversation engines like [CICERO](https://www.science.org/doi/10.1126/science.ade9097), classical theories of rhetoric and [syllogisms](https://en.wikipedia.org/wiki/Syllogism), concepts in graph theory or classical CS, and my own experience as a reader. It allows the system to take in a text, clean it to make it less ambiguous, generate a knowledge graph, and then use textual context and the knowledge graph combined to answer questions about why the author wrote certain parts of the text.
 
 ## Methodology and Rationale
 
