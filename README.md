@@ -1,5 +1,10 @@
 # autoratiocinator
-Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations. Also uses `tiktoken` for token calculations specific to the OpenAI API, `nltk` for basic NLP procedures, and `numpy` for comparing embeddings.
+An attempt to build a narrow, scoped, and auditable AI system that enhances human analysis and text comprehension rather than replacing human judgement. The project is **in progress**.
+
+Demo available at [https://socratides.streamlit.io](https://socratides.streamlit.io) (I am funding this with my own resources atm so usage caps may be passed, [email me](mailto:kwp24@cam.ac.uk) if the app is down).
+
+## Requirements
+Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations. Also uses `tiktoken` for token calculations specific to the OpenAI API, `nltk` for basic NLP procedures, and `numpy` for comparing embeddings. Additionally, `streamlit` provides web app functionality.
 
 ## Quickstart
 Trying to create a reasoning engine based on a knowledge graph. To try a toy example save the openai API key as an environmental variable in shell and run the following commands:
@@ -8,9 +13,11 @@ Trying to create a reasoning engine based on a knowledge graph. To try a toy exa
 /explain $5
 ```
 
-## Quick Overview
+## Theory Overview
 
-Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. The project is **in progress**.
+Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. 
+
+My approach incorporates techniques drawn from theorem provers like [Lean](https://lean-lang.org/), guided conversation engines like [CICERO](https://www.science.org/doi/10.1126/science.ade9097), classical theories of rhetoric and [syllogisms](https://en.wikipedia.org/wiki/Syllogism), and my own experience as a reader. It allows the system to take in a text, clean it to make it less ambiguous, generate a knowledge graph, and then use textual context and the knowledge graph combined to answer questions about why the author wrote certain parts of the text.
 
 ## Methodology and Rationale
 
