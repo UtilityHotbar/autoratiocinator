@@ -18,7 +18,8 @@ def rewriter_wrap(raw_text):
     return rewriter(raw_text)
 
 st.write('''
-# Socratides          
+# Socratides
+For source see [https://github.com/UtilityHotbar/autoratiocinator](https://github.com/UtilityHotbar/autoratiocinator).  
 ''')
 
 text_file_to_analyse = st.file_uploader("Choose a text file to analyse", type="txt")
