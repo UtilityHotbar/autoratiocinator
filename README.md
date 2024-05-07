@@ -1,7 +1,7 @@
 # autoratiocinator
 An attempt to build a narrow, scoped, and auditable AI system that enhances human analysis and text comprehension rather than replacing human judgement. The project is **in progress**.
 
-Demo available at [https://socratides.streamlit.io](https://socratides.streamlit.io) (I am funding this with my own resources atm so usage caps may be passed, [email me](mailto:kwp24@cam.ac.uk) if the app is down).
+Demo available at [https://socratides.streamlit.app](https://socratides.streamlit.app) (I am funding this with my own resources atm so usage caps may be passed, [email me](mailto:kwp24@cam.ac.uk) if the app is down).
 
 ## Requirements
 Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations. Also uses `tiktoken` for token calculations specific to the OpenAI API, `nltk` for basic NLP procedures, and `numpy` for comparing embeddings. Additionally, `streamlit` provides web app functionality.
