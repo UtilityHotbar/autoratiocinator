@@ -17,7 +17,7 @@ Trying to create a reasoning engine based on a knowledge graph. To try a toy exa
 
 Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. 
 
-My approach incorporates techniques drawn from theorem provers like [Lean](https://lean-lang.org/), guided conversation engines like [CICERO](https://www.science.org/doi/10.1126/science.ade9097), classical theories of rhetoric and [syllogisms](https://en.wikipedia.org/wiki/Syllogism), concepts in graph theory or classical CS, and my own experience as a reader. It allows the system to take in a text, clean it to make it less ambiguous, generate a knowledge graph, and then use textual context and the knowledge graph combined to answer questions about why the author wrote certain parts of the text.
+My approach incorporates techniques drawn from theorem provers like [Lean](https://lean-lang.org/), guided conversation engines like [CICERO](https://www.science.org/doi/10.1126/science.ade9097), classical theories of rhetoric and [syllogisms](https://en.wikipedia.org/wiki/Syllogism), concepts in graph theory or classical CS, and my own experience as a reader. It allows the system to take in a text, clean it to make it less ambiguous, generate a knowledge graph, and then use textual context and the knowledge graph combined to answer questions about why the author wrote certain parts of the text. To the greatest extent possible, you should see the thinking process that led the model to this conclusion, and change any part of the process (e.g. editing the knowledge graph or clarifying the cleaned text) where you feel it has deviated from the ideal answer.
 
 ## Methodology and Rationale
 
@@ -25,8 +25,6 @@ The project represents a broader effort to treat LLMs as software tools or funct
 
 ## Explanation
 `network_main.py` contains a CLI based interface for constructing knowledge graphs (MultiDiGraphs in `networkx` where nodes are statements and directed edges infer a dependency relationship between statements. E.g. "Socrates is mortal" depends on "Socrates is a man" and "All men are mortal"). Use `/help` to list all available commands. You can create nodes, delete nodes, create and delete dependencies, visualise graphs, and list dependencies for any given node.
-
-`current_graph.gexf` contains an example knowledge graph with a few statements about Socrates you can experiment with.
 
 `rationcinatorutils.py` contains a series of utility functions (cosine similarity, getting embeddings for text etc.).
 
