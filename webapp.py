@@ -6,6 +6,7 @@ from knowledge_graph import *
 from topdown_ratiocinator import *
 from network_main import *
 import uuid
+from io import StringIO
 import tempfile
 
 @st.cache_data
@@ -23,6 +24,7 @@ st.write('''
 text_file_to_analyse = st.file_uploader("Choose a text file to analyse", type="txt")
 if text_file_to_analyse is not None:
     string_data = text_file_to_analyse.getvalue().decode("utf-8")
+    print(string_data)
     cleaned_text = rewriter_wrap(string_data)
     with st.expander("Cleaned text"):
         st.write(cleaned_text)
