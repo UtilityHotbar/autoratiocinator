@@ -52,7 +52,35 @@ def get_top_search_results(sentence: str, text_embeds: dict, cutoff=10):
 
 
 def rewriter(text):
-    paras = [_ for _ in text.split('\n\n') if _ not in BLANKS]
+    paras = [_ for _ in text.replace('\r', '').split('\n\n') if _ not in BLANKS]
+    diced_paras = []
+    for undiced_para in paras:
+        if num_tokens_from_string(undiced_para) > 150:
+            sentences_in_para = sent_tokenize(undiced_para)
+            done = False
+            i = 0
+            ctoks = 0
+            cbuf = []
+            while not done:
+                curr_sent = sentences_in_para[i]
+                curr_sent_len = num_tokens_from_string(curr_sent)
+                if curr_sent_len > 150:
+                    diced_paras.append(' '.join(cbuf))
+                    diced_paras.append(curr_sent)
+                    cbuf = []
+                    ctoks = 0
+                else:
+                    if (ctoks + curr_sent_len) > 150:
+                        diced_paras.append(' '.join(cbuf))
+                        cbuf = [curr_sent]
+                        ctoks = curr_sent_len
+                    else:
+                        cbuf.append(curr_sent)
+                        ctoks += curr_sent_len
+
+        else:
+            diced_paras.append(undiced_para)
+    paras = diced_paras
     print('PARAGRAPHS - ', paras)
     toked_paras = []
     for text in paras:
