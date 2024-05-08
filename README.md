@@ -6,13 +6,6 @@ Demo available at [https://socratides.streamlit.app](https://socratides.streamli
 ## Requirements
 Uses `networkx` for graphs, `openai` for LLMs, and `pyvis` for visualisations. Also uses `tiktoken` for token calculations specific to the OpenAI API, `nltk` for basic NLP procedures, and `numpy` for comparing embeddings. Additionally, `streamlit` provides web app functionality.
 
-## Quickstart
-Trying to create a reasoning engine based on a knowledge graph. To try a toy example save the openai API key as an environmental variable in shell and run the following commands:
-```
-/print *
-/explain $5
-```
-
 ## Theory Overview
 
 Papers such as the following [https://arxiv.org/abs/2402.08164v1](https://arxiv.org/abs/2402.08164v1) outline some fundamental limitations with Transformers in fields such as semantic or functional composition. A suggested solution is to incorporate LLMs with knowledge graphs. This is a practical experiment in automatically generating, assembling, and using knowledge graphs to reason about existing texts. 
