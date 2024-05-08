@@ -77,6 +77,9 @@ def rewriter(text):
                     else:
                         cbuf.append(curr_sent)
                         ctoks += curr_sent_len
+                i += 1
+                if (i==(len(sentences_in_para)-1)):
+                    done = True
 
         else:
             diced_paras.append(undiced_para)
