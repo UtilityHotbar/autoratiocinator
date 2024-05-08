@@ -188,26 +188,22 @@ def associator(text):
                 context = 'before'
             elif ci > si:
                 context = 'after'
-            done = False
-            while not done:
-                done = True
-                relate = client.chat.completions.create(model=MODEL_NAME,
-                    messages=[
-                        {"role": "system", "content": COMPARATOR_PROMPT.replace('%STM1%', sentence).replace('%CONTEXT%', context).replace('%STM2%', candidate)},
-                        ],
-                    temperature=0.5,
-                    max_tokens=1000)
-                answer = relate.choices[0].message.content.lower().strip('"')
-                if answer == 'related':
-                    G.add_edge(uuid_reference[sentence], uuid_reference[candidate], key=CONNECT, title=CONNECT_LABEL)
-                elif answer == 'first-depend-second':
-                    G.add_edge(uuid_reference[sentence], uuid_reference[candidate], key=SOURCE, title=SOURCE_LABEL)
-                elif answer == 'second-depend-first':
-                    G.add_edge(uuid_reference[candidate], uuid_reference[sentence], key=SOURCE, title=SOURCE_LABEL)
-                elif answer == 'unrelated':
-                    pass
-                else:
-                    done = False
+            # relate = client.chat.completions.create(model=MODEL_NAME,
+            #     messages=[
+            #         {"role": "system", "content": COMPARATOR_PROMPT.replace('%STM1%', sentence).replace('%CONTEXT%', context).replace('%STM2%', candidate)},
+            #         ],
+            #     temperature=0.5,
+            #     max_tokens=1000)
+            # answer = relate.choices[0].message.content.lower().strip('"')
+            answer = get_mc_answer_simple(COMPARATOR_PROMPT.replace('%STM1%', sentence).replace('%CONTEXT%', context).replace('%STM2%', candidate), ['related', 'first-depend-second', 'second-depend-first', 'unrelated'])
+            if answer == 'related':
+                G.add_edge(uuid_reference[sentence], uuid_reference[candidate], key=CONNECT, title=CONNECT_LABEL)
+            elif answer == 'first-depend-second':
+                G.add_edge(uuid_reference[sentence], uuid_reference[candidate], key=SOURCE, title=SOURCE_LABEL)
+            elif answer == 'second-depend-first':
+                G.add_edge(uuid_reference[candidate], uuid_reference[sentence], key=SOURCE, title=SOURCE_LABEL)
+            elif answer == 'unrelated':
+                pass
     return G
 
 
