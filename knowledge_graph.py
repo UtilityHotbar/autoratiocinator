@@ -20,6 +20,7 @@ BLANKS = ['', ' ', '\n']
 
 SIMILARITY_THRESHOLD = 0.9
 
+CLEANER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to rewrite passages and remove line breaks in the middle of sentences, loose headers, errors in spelling, artefacts from printing etc. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
 REWRITER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to rewrite passages into clearer, more intelligible sentences that are easier to read and understand. Where possible, use simple language and clear vocabulary. If the sentence is a simple sentence, keep it the same. If the sentence is too long or complex, split it into multiple shorter sentences. Do not say "the passage said...", rewrite it as if you were the writer. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
 NOUN_EXPANDER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to expand pronouns like "they", "them", "it" etc. into the nouns they represent. For example, if you see "John went to the store. He was hungry", return "John went to the store. John was hungry". If people are quoted, add who was quoted. If you are given "The author cites Cicero. He was writing about romans. It is said that the romans are clever." Return "The author cites Cicero. Cicero was writing about romans. Cicero said that the romans are clever." This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
 SUMMARISER_PROMPT = 'You are a dedicated, attentive, and intelligent copy editor. Your job is to summarise a passage into one or a few short sentences representing its key arguments. This is the passage you need to rewrite : "%STM%". Respond with the rewritten passage and nothing else.'
@@ -55,7 +56,7 @@ def rewriter(text):
     print('PARAGRAPHS - ', paras)
     toked_paras = []
     for text in paras:
-        prompt_list = [SUMMARISER_PROMPT, REWRITER_PROMPT, NOUN_EXPANDER_PROMPT]
+        prompt_list = [CLEANER_PROMPT, SUMMARISER_PROMPT, REWRITER_PROMPT, NOUN_EXPANDER_PROMPT]
         for curr_prompt in prompt_list:
             rewrite = client.chat.completions.create(model=MODEL_NAME,
                 messages=[
