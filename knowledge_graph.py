@@ -52,7 +52,7 @@ def get_top_search_results(sentence: str, text_embeds: dict, cutoff=10):
 
 
 def rewriter(text):
-    paras = [_ for _ in text.replace('\r', '\n').split('\n\n') if _ not in BLANKS]
+    paras = [_ for _ in text.split('\n\n') if _ not in BLANKS]
     print('PARAGRAPHS - ', paras)
     toked_paras = []
     for text in paras:
