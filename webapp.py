@@ -9,6 +9,8 @@ import uuid
 from io import StringIO
 import tempfile
 
+# TODO: look-forward instead of look-backwards in the knowledge grpah to see what statements a given statement is "setting up"
+
 @st.cache_data
 def associator_wrap(cleaned_text):
     return associator(cleaned_text)
@@ -19,7 +21,8 @@ def rewriter_wrap(raw_text):
 
 st.write('''
 # Socratides
-For source see [https://github.com/UtilityHotbar/autoratiocinator](https://github.com/UtilityHotbar/autoratiocinator).  
+For source see [https://github.com/UtilityHotbar/autoratiocinator](https://github.com/UtilityHotbar/autoratiocinator). 
+For best results we recommend short nonfiction texts e.g. news articles (<1k words max). Please wait up to about 25 minutes for a full analysis.
 ''')
 
 text_file_to_analyse = st.file_uploader("Choose a text file to analyse", type="txt")
