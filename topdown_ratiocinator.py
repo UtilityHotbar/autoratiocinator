@@ -71,9 +71,19 @@ def topdown_dfs_convincer(arg_stack, graph, goal='', dict_of_stms=None, stm_hist
         stm_history = []
     supports = ''
     immediate_support_stms = []
-    if arg_stack[CHILDREN]:
-        for subarg in arg_stack[CHILDREN]:
-            immediate_support_stms.append('The author also said that "'+dict_of_stms[subarg].strip("\n")+'"')
+    other_stms = list(dict_of_stms.keys())
+    other_stms.remove(arg_stack[NODE])
+    if len(other_stms) > 1:
+        for other_stm in other_stms:
+            immediate_support_stms.append('The author also said before this that "'+dict_of_stms[other_stm].strip("\n")+'"')
+    
+    look_forward = graph.predecessors(arg_stack[NODE])
+    if look_forward:
+        for next_stm in look_forward:
+            if graph.has_edge(next_stm, arg_stack[NODE], key=SOURCE):
+                    immediate_support_stms.append('The author also said after this that "'+graph.nodes[next_stm]['label'].strip("\n")+'"')
+
+
     if immediate_support_stms:
         supports = ' '.join(immediate_support_stms).strip('\n')
 

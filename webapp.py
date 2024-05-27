@@ -20,7 +20,7 @@ def rewriter_wrap(raw_text):
     return rewriter(raw_text)
 
 st.write('''
-# Socratides
+# Socratides v1.2
 For source see [https://github.com/UtilityHotbar/autoratiocinator](https://github.com/UtilityHotbar/autoratiocinator). 
 For best results we recommend short nonfiction texts e.g. news articles (<1k words max). Please wait up to about 25 minutes for a full analysis.
 ''')
@@ -47,7 +47,7 @@ if text_file_to_analyse is not None:
         node = nodelist[reflist.index(sentence)]
         alldeps = list_dependencies(G, node)
         if alldeps:
-            with st.expander("Sentence dependencies"):
+            with st.expander("Top-level sentence dependencies"):
                 st.write('* '+'\n* '.join([G.nodes[_]['label'] for _ in alldeps]))
         arg_stack = get_arg_stack(G, node)
         st.write(topdown_dfs_convincer(arg_stack, G, sentence, reference_text=cleaned_text, repl=False))

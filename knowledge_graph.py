@@ -89,7 +89,7 @@ def rewriter(text):
     for text in paras:
         prompt_list = [CLEANER_PROMPT, SUMMARISER_PROMPT, REWRITER_PROMPT, NOUN_EXPANDER_PROMPT]
         for curr_prompt in prompt_list:
-            rewrite = client.chat.completions.create(model=MODEL_NAME,
+            rewrite = get_completion(model=MODEL_NAME,
                 messages=[
                     {"role": "system", "content": curr_prompt.replace('%STM%', text)},
                     ],
