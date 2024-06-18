@@ -95,7 +95,7 @@ def rewriter(text):
                     ],
                 temperature=0.5,
                 max_tokens=3000)
-            text = rewrite.choices[0].message.content
+            text = rewrite
         print(text)
         toked_paras+=sent_tokenize(text)
     return toked_paras
