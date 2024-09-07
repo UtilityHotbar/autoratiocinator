@@ -25,6 +25,8 @@ For source see [https://github.com/UtilityHotbar/autoratiocinator](https://githu
 For best results we recommend short nonfiction texts e.g. news articles (<1k words max). Please wait up to about 25 minutes for a full analysis.
 ''')
 
+nltk.download('punkt_tab')
+
 text_file_to_analyse = st.file_uploader("Choose a text file to analyse", type="txt")
 if text_file_to_analyse is not None:
     string_data = text_file_to_analyse.getvalue().decode("utf-8")
